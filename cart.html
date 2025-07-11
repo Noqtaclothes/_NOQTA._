@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Cart - NOQTA</title>
+  <style>
+    body { font-family: sans-serif; background: #fff; margin: 0; padding: 20px; }
+    h1 { text-align: center; margin-bottom: 30px; }
+    .cart-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      border: 1px solid #eee;
+      border-radius: 10px;
+      background-color: #f9f9f9;
+    }
+    .cart-items {
+      margin-bottom: 30px;
+    }
+    .cart-item {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 15px 0;
+      border-bottom: 1px solid #ddd;
+    }
+    .cart-item:last-child {
+      border-bottom: none;
+    }
+    .cart-item img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 5px;
+    }
+    .item-details {
+      flex-grow: 1;
+    }
+    .item-details p {
+      margin: 0;
+      font-size: 16px;
+      color: #333;
+    }
+    .item-details .item-name {
+      font-weight: bold;
+      font-size: 18px;
+    }
+    .item-quantity {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .item-quantity input {
+      width: 50px;
+      padding: 5px;
+      text-align: center;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .remove-item-btn {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .remove-item-btn:hover {
+      background-color: #c82333;
+    }
+    .cart-summary {
+      text-align: right;
+      font-size: 20px;
+      font-weight: bold;
+      margin-top: 20px;
+      border-top: 2px solid #ddd;
+      padding-top: 15px;
+    }
+    .cart-summary span {
+      color: #000;
+    }
+
+    /* Customer info section styles (similar to product pages) */
+    .customer-info {
+      margin-top: 40px;
+      padding: 20px;
+      border: 1px solid #eee;
+      border-radius: 10px;
+      background-color: #fff; /* Lighter background for this section */
+    }
+    .customer-info h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .customer-info label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+      text-align: left;
+    }
+    .customer-info input[type="text"],
+    .customer-info input[type="email"],
+    .customer-info textarea {
+      width: calc(100% - 22px);
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    .customer-info textarea {
+      resize: vertical;
+    }
+    .place-order-btn {
+      background-color: black;
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-top: 20px;
+      width: 100%; /* Make button full width */
+      display: block;
+    }
+    .place-order-btn:hover {
+      background-color: #333;
+    }
+
+    /* Message for empty cart */
+    #empty-cart-message {
+      text-align: center;
+      font-size: 18px;
+      color: #666;
+      padding: 50px 0;
+    }
+    #thanks { /* This is the message after successful order */
+      display: none; /* CORRECTED: This ensures it's hidden by default */
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      z-index: 9999;
+    }
+
+    /* Back to Shopping Button */
+    .back-to-shop-btn {
+        display: block;
+        width: fit-content;
+        margin: 20px auto 0;
+        padding: 10px 20px;
+        background-color: #6c757d;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+    }
+    .back-to-shop-btn:hover {
+        background-color: #5a6268;
+    }
+  </style>
+</head>
+<body>
+  <h1>Your Shopping Cart</h1>
+
+  <div class="cart-container">
+    <div id="cart-items-container" class="cart-items">
+      </div>
+
+    <div id="empty-cart-message" style="display: none;">Your cart is empty. <a href="categories.html" class="back-to-shop-btn">Continue Shopping</a></div>
+
+    <div id="cart-summary" class="cart-summary" style="display: none;">
+      Total: <span id="cart-total">0 EGP</span>
+    </div>
+
+    <form id="checkout-form" action="https://formspree.io/f/meokndya" method="POST" onsubmit="submitOrder(event)" style="display: none;">
+      <div class="customer-info">
+        <h2>Your Information</h2>
+        <label for="customer_name">Full Name:</label>
+        <input type="text" id="customer_name" name="customer_name" required>
+
+        <label for="customer_email">Email:</label>
+        <input type="email" id="customer_email" name="customer_email" required>
+
+        <label for="customer_phone">Phone Number (Optional):</label>
+        <input type="text" id="customer_phone" name="customer_phone">
+
+        <label for="customer_address">Shipping Address:</label>
+        <textarea id="customer_address" name="customer_address" rows="4" required></textarea>
+      </div>
+
+      <button type="submit" class="place-order-btn">Place Order</button>
+      <input type="hidden" name="_subject" value="New NOQTA Website Order">
+      <input type="hidden" name="_cc" value="noqta.clothes@gmail.com">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="cart_contents" id="cart_contents_input">
+    </form>
+  </div>
+
+  <div id="thanks">Thank You For Ordering! Redirecting to homepage...</div>
+
+  <footer>
+    <div>Contact us:</div>
+    <div>
+      <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" width="16"/> @_noqta._ <br>
+      <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Gmail_Icon.png" width="16"/> noqta.clothes@gmail.com
+    </div>
+  </footer>
+
+<script>
+  document.addEventListener('DOMContentLoaded', loadCart);
+
+  function loadCart() {
+    const cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+    const cartItemsContainer = document.getElementById('cart-items-container');
+    const emptyCartMessage = document.getElementById('empty-cart-message');
+    const cartSummary = document.getElementById('cart-summary');
+    const checkoutForm = document.getElementById('checkout-form');
+    let total = 0;
+
+    cartItemsContainer.innerHTML = ''; // Clear previous items
+
+    if (cart.length === 0) {
+      emptyCartMessage.style.display = 'block';
+      cartSummary.style.display = 'none';
+      checkoutForm.style.display = 'none';
+      return;
+    }
+
+    emptyCartMessage.style.display = 'none';
+    cartSummary.style.display = 'block';
+    checkoutForm.style.display = 'block';
+
+    cart.forEach(item => {
+      const itemElement = document.createElement('div');
+      itemElement.classList.add('cart-item');
+      itemElement.innerHTML = `
+        <img src="${item.image}" alt="${item.name}">
+        <div class="item-details">
+          <p class="item-name">${item.name}</p>
+          <p>Size: ${item.size}</p>
+          <p>Color: ${item.color}</p>
+          <p>Price: ${item.price} EGP</p>
+        </div>
+        <div class="item-quantity">
+          <input type="number" value="${item.quantity}" min="1" onchange="updateQuantity('${item.key}', this.value)">
+        </div>
+        <div>
+          <button class="remove-item-btn" onclick="removeItem('${item.key}')">Remove</button>
+        </div>
+      `;
+      cartItemsContainer.appendChild(itemElement);
+      total += item.price * item.quantity;
+    });
+
+    document.getElementById('cart-total').textContent = `${total} EGP`;
+  }
+
+  function updateQuantity(key, newQuantity) {
+    let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+    const itemIndex = cart.findIndex(item => item.key === key);
+
+    if (itemIndex > -1) {
+      const quantity = parseInt(newQuantity);
+      if (quantity > 0) {
+        cart[itemIndex].quantity = quantity;
+      } else {
+        // If quantity is 0 or less, remove the item
+        cart.splice(itemIndex, 1);
+      }
+      localStorage.setItem('shoppingCart', JSON.stringify(cart));
+      loadCart(); // Reload cart to update display and total
+    }
+  }
+
+  function removeItem(key) {
+    let cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+    cart = cart.filter(item => item.key !== key);
+    localStorage.setItem('shoppingCart', JSON.stringify(cart));
+    loadCart(); // Reload cart to update display and total
+  }
+
+  function submitOrder(event) {
+    event.preventDefault(); // Prevent default form submission
+
+    const cart = JSON.parse(localStorage.getItem('shoppingCart')) || [];
+    if (cart.length === 0) {
+      alert("Your cart is empty. Please add items before placing an order.");
+      return;
+    }
+
+    // Prepare cart contents for Formspree
+    const cartContents = cart.map(item =>
+      `${item.name} (Size: ${item.size}, Color: ${item.color}, Qty: ${item.quantity}, Price: ${item.price} EGP)`
+    ).join('\n');
+
+    document.getElementById('cart_contents_input').value = cartContents;
+
+    const form = event.target;
+
+    // Validate customer info fields on submission
+    const customerName = document.getElementById('customer_name').value;
+    const customerEmail = document.getElementById('customer_email').value;
+    const customerAddress = document.getElementById('customer_address').value;
+
+    if (!customerName || !customerEmail || !customerAddress) {
+      alert('Please fill in all required customer information fields (Full Name, Email, Shipping Address).');
+      return;
+    }
+
+    fetch(form.action, {
+      method: "POST",
+      body: new FormData(form),
+      headers: { 'Accept': 'application/json' }
+    })
+    .then(response => {
+      if (response.ok) {
+        document.getElementById('thanks').style.display = 'flex'; // Show thanks message
+        localStorage.removeItem('shoppingCart'); // Clear cart after successful order
+        setTimeout(() => window.location.href = 'index.html', 4000); // Redirect to homepage
+      } else {
+        alert('There was an error placing your order. Please try again later.');
+        console.error('Form submission error:', response.statusText);
+      }
+    })
+    .catch(error => {
+      alert('There was an error placing your order. Please try again later.');
+      console.error('Form submission error:', error);
+    });
+  }
+</script>
+
+</body>
+</html>
