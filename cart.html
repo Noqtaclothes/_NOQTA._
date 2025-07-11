@@ -71,7 +71,7 @@
       font-size: 14px;
     }
     #thanks {
-      display: none; /* Hidden by default */
+      display: none; /* Corrected: Only 'display: none;' here initially */
       position: fixed;
       top: 0;
       left: 0;
@@ -79,7 +79,6 @@
       height: 100%;
       background: rgba(0,0,0,0.8);
       color: white;
-      display: flex; /* Kept for JS to set */
       align-items: center;
       justify-content: center;
       font-size: 24px;
@@ -142,7 +141,6 @@
     // For now, it will show the empty cart message until items are added
     document.addEventListener('DOMContentLoaded', () => {
       // You would typically retrieve cart items from localStorage here
-      // For this static HTML, it will initially show empty cart
       const cartItemsContainer = document.getElementById('cart-items');
       const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
 
